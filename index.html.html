@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My English Courses</title>
+  <style>
+    /* === Глобальные стили и темная тема === */
+    :root {
+      --bg-color: #27a0c4;
+      --text-color: #e0e0e0;
+      --card-bg: #8c848c;
+      --card-hover: #2a2a2a;
+      --accent-color: #ff6f61; /* яркий акцентный цвет */
+      --modal-bg: rgba(0, 0, 0, 0.85);
+      --modal-content-bg: #252525;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      color: white;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      opacity: 0.8;
+    }
+
+    /* === Сетка карточек === */
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* === Карточка курса === */
+    .course-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease, background 0.3s;
+    }
+
+    .course-card:hover {
+      transform: translateY(-6px);
+      background: var(--card-hover);
+    }
+
+    .course-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .course-content {
+      padding: 16px;
+    }
+
+    .course-title {
+      font-size: 1.3rem;
+      margin-bottom: 8px;
+      color: white;
+    }
+
+    .course-desc {
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      opacity: 0.9;
+    }
+
+    .course-price {
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: var(--accent-color);
+      margin-bottom: 12px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: var(--accent-color);
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: #ff5240;
+    }
+
+    /* === Модальное окно === */
+    .modal {
+      display: none; /* скрыто по умолчанию */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--modal-bg);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: var(--modal-content-bg);
+      border-radius: 16px;
+      width: 95%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow: auto;
+      position: relative;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: #444;
+      color: white;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* === Карусель в модалке === */
+    .carousel {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .carousel-images {
+      position: relative;
+      height: 250px;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+
+    .carousel-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .carousel-img.active {
+      opacity: 1;
+      z-index: 1;
+    }
+
+    .carousel-nav {
+      margin-top: 12px;
+    }
+
+    .carousel-btn {
+      background: #444;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      margin: 0 4px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .modal-title {
+      font-size: 1.8rem;
+      margin-bottom: 16px;
+      color: white;
+    }
+
+    .modal-desc {
+      margin-bottom: 20px;
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    .modal-price {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: var(--accent-color);
+      margin: 20px 0;
+    }
+
+    /* Доступность: фокус для клавиатуры */
+    .btn:focus,
+    .close-btn:focus,
+    .carousel-btn:focus {
+      outline: 2px solid var(--accent-color);
+      outline-offset: 2px;
+    }
+
+    /* Медиа-запросы */
+    @media (max-width: 600px) {
+      .course-img { height: 140px; }
+      .modal-content { padding: 16px; }
+      .carousel-images { height: 180px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🌟 Learn English with Yulia</h1>
+    <p class="subtitle">Practical, fun, and effective courses for real-world use</p>
+  </header>
+
+  <!-- === СЕТКА КАРТОЧЕК КУРСОВ === -->
+  <div class="courses-grid">
+
+    <!-- === КАРТОЧКА КУРСА №1 — Пример. Скопируйте этот блок для новых курсов === -->
+    <div class="course-card" data-course-id="1">
+      <!-- ⬇️ ЗАМЕНИТЕ src НА ПУТЬ К ВАШЕЙ КАРТИНКЕ -->
+      <img src="./images/santa1.png" alt="Course 1: Business English" class="course-img">
+      <div class="course-content">
+        <h3 class="course-title">Fun with English on holidays</h3>
+        <p class="course-desc"> A short-term course to brush up on your English</p>
+        <div class="course-price">10,000</div>
+        <button class="btn open-modal-btn" data-target="1">More</button>
+      </div>
+    </div>
+
+    <!-- === КАРТОЧКА КУРСА №2 — Пример === -->
+    <div class="course-card" data-course-id="2">
+      <img src="./images/quest.png" alt="Course 2: Grammar Quest" class="course-img">
+      <div class="course-content">
+        <h3 class="course-title">Grammar Quest</h3>
+        <p class="course-desc">General English for children and teenagers in small groups.</p>
+        <div class="course-price">12,000</div>
+        <button class="btn open-modal-btn" data-target="2">More</button>
+      </div>
+    </div>
+
+    <!-- === КАРТОЧКА КУРСА №3 — Пример === -->
+    <div class="course-card" data-course-id="3">
+      <img src="./images/airport.png" alt="Course 3: Travel English" class="course-img">
+      <div class="course-content">
+        <h3 class="course-title">Travel English Survival Kit</h3>
+        <p class="course-desc">Order food, ask for directions, handle emergencies — all in natural English.</p>
+        <div class="course-price">1,500 per lesson</div>
+        <button class="btn open-modal-btn" data-target="3">More</button>
+      </div>
+    </div>
+
+    <!-- 💡 Добавляйте новые курсы, копируя блок выше и меняя:
+         - data-course-id (должен совпадать с data-target в кнопке)
+         - src изображения
+         - заголовок, описание, цену
+    -->
+
+  </div>
+
+  <!-- === МОДАЛЬНОЕ ОКНО (ОДНО ДЛЯ ВСЕХ КУРСОВ) === -->
+  <div id="courseModal" class="modal" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+    <div class="modal-content" tabindex="-1">
+      <button class="close-btn" aria-label="Close modal">&times;</button>
+
+      <!-- ⬇️ Контент модалки будет подставляться через JS -->
+      <div id="modal-body">
+        <!-- Заполняется динамически -->
+      </div>
+    </div>
+  </div>
+
+  <!-- === JavaScript: открытие модалки + карусель === -->
+  <script>
+    // === ДАННЫЕ КАРТОЧЕК — ЗАМЕНИТЕ НА СВОИ ===
+    // Каждый курс — объект с ID, массивом изображений, заголовком, описанием и ценой
+    const courses = {
+      1: {
+        id: 1,
+        images: [
+          "./images/quiz1.png",
+          "./images/quiz2.png",
+          "./images/quiz3.png"
+        ],
+        title: "Winter Holiday Fun",
+        description: `
+          <p>General English for children and teenagers in small groups.</p>
+          <p><strong>Key points:</strong></p>
+          <ul>
+            <li>10 online lessons (Zoom)</li>
+            <li>15 interactive grammar & vocabulary quizzes</li>
+            <li>Topics: Hobbies, About Me, The World Around Us, Music, Sports and more!</li>
+            <li>Certificate of completion</li>
+          </ul>
+          <p>✅ Perfect for elementary to advanced learners (A1–C1)</p>
+        `,
+        price: "10,000"
+      },
+      2: {
+        id: 2,
+        images: [
+          "https://via.placeholder.com/800x450/4ecdc4/000000?text=Slide+1:+Tense+Comparison",
+          "https://via.placeholder.com/800x450/70d6cc/000000?text=Slide+2:+Quiz+Example",
+          "https://via.placeholder.com/800x450/92e0d6/000000?text=Slide+3:+Real+Life+Usage"
+        ],
+        title: "Grammar Quest",
+        description: `
+          <p>Turn grammar into a game! This course uses gamified learning to help you internalize basic grammar concepts.</p>
+          <p><strong>Features:</strong></p>
+          <ul>
+            <li>10 story-based modules</li>
+            <li>Interactive quizzes with instant feedback</li>
+            <li>“Time Detective” game: spot the correct tense in videos</li>
+            <li>Progress wheel & XP rewards 🎮</li>
+          </ul>
+          <p>✅ Ideal for A2–B1 learners</p>
+        `,
+        price: "12,000"
+      },
+      3: {
+        id: 3,
+        images: [
+          "https://via.placeholder.com/800x450/ffd166/000000?text=Slide+1:+Airport+Scenario",
+          "https://via.placeholder.com/800x450/ffe08f/000000?text=Slide+2:+Restaurant+Dialog",
+          "https://via.placeholder.com/800x450/fff0b8/000000?text=Slide+3:+Emergency+Phrases"
+        ],
+        title: "Travel English Survival Kit",
+        description: `
+          <p>Don’t just survive — thrive on your next trip! Learn practical phrases, cultural tips, and confidence-building techniques.</p>
+          <p><strong>Includes:</strong></p>
+          <ul>
+            <li>Live lessons (Zoom)</li>
+            <li>Phrasebook PDF with pronunciation guide</li>
+            <li>Offline-friendly mobile flashcards</li>
+            <li>24/7 “Emergency Help” voice assistant (simulated)</li>
+          </ul>
+          <p>✅ Beginner-friendly (A1+)</p>
+        `,
+        price: "1,500 per lesson"
+      }
+      // 💡 Добавляйте новые курсы здесь по аналогии
+    };
+
+    // DOM-элементы
+    const modal = document.getElementById('courseModal');
+    const modalBody = document.getElementById('modal-body');
+    const closeBtn = modal.querySelector('.close-btn');
+    const openButtons = document.querySelectorAll('.open-modal-btn');
+
+    // Функция: генерация HTML модалки для курса
+    function renderModal(course) {
+      // Генерируем HTML для карусели
+      let carouselImagesHTML = '';
+      course.images.forEach((imgSrc, index) => {
+        const isActive = index === 0 ? 'active' : '';
+        carouselImagesHTML += `
+          <img src="${imgSrc}" alt="Slide ${index + 1} for ${course.title}" class="carousel-img ${isActive}" data-index="${index}">
+        `;
+      });
+
+      return `
+        <div class="carousel">
+          <div class="carousel-images" id="carousel-images">
+            ${carouselImagesHTML}
+          </div>
+          <div class="carousel-nav">
+            <button class="carousel-btn" id="prev-btn" aria-label="Previous image">&lt;</button>
+            <button class="carousel-btn" id="next-btn" aria-label="Next image">&gt;</button>
+          </div>
+        </div>
+        <h2 class="modal-title" id="modal-title">${course.title}</h2>
+        <div class="modal-desc">${course.description}</div>
+        <div class="modal-price">${course.price}</div>
+        <!-- ⬇️ ВСТАВЬТЕ СЮДА СВОЮ ССЫЛКУ НА ОПЛАТУ/ФОРМУ -->
+        <button class="btn" id="final-buy-btn">✅ Buy</button>
+      `;
+    }
+
+    // Функция: показ модалки
+    function openModal(courseId) {
+      const course = courses[courseId];
+      if (!course) return;
+
+      modalBody.innerHTML = renderModal(course);
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden'; // запретить прокрутку фона
+
+      // Сразу инициализируем карусель
+      initCarousel();
+    }
+
+    // Закрытие модалки
+    function closeModal() {
+      modal.style.display = 'none';
+      document.body.style.overflow = ''; // восстановить прокрутку
+    }
+
+    // Карусель (простая, без внешних библиотек)
+    let currentIndex = 0;
+    function initCarousel() {
+      const images = modalBody.querySelectorAll('.carousel-img');
+      const total = images.length;
+
+      document.getElementById('prev-btn').onclick = () => {
+        currentIndex = (currentIndex - 1 + total) % total;
+        updateCarousel();
+      };
+
+      document.getElementById('next-btn').onclick = () => {
+        currentIndex = (currentIndex + 1) % total;
+        updateCarousel();
+      };
+
+      function updateCarousel() {
+        images.forEach((img, i) => {
+          img.classList.toggle('active', i === currentIndex);
+        });
+        // Обновляем ARIA для скринридеров (опционально, но полезно)
+        const activeImg = images[currentIndex];
+        if (activeImg) {
+          images.forEach(img => img.setAttribute('aria-hidden', 'true'));
+          activeImg.setAttribute('aria-hidden', 'false');
+        }
+      }
+
+      // Начальная инициализация: первый слайд активен
+      images.forEach((img, i) => {
+        img.setAttribute('aria-hidden', i === 0 ? 'false' : 'true');
+      });
+    }
+
+    // Обработчики событий
+    openButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        openModal(targetId);
+      });
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+
+    // Закрытие по Esc
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.style.display === 'flex') {
+        closeModal();
+      }
+    });
+
+    // Закрытие по клику вне контента
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    // ⚠️ Последнее: кнопка "Buy" в модалке — настройте её под себя!
+    // Сейчас она просто закрывает модалку. Замените на:
+    //   - <a href="https://your-payment-link">Buy</a>
+    //   - или onclick="location.href='...'"
+    //   - или форму оплаты (Stripe, PayPal и т.д.)
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'final-buy-btn') {
+        alert('✅ You clicked Buy! Replace this with your payment link.');
+        // Пример:
+        // window.location.href = 'https://buy.stripe.com/...';
+      }
+    });
+  </script>
+
+</body>
+</html>
